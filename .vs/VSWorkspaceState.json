@@ -1,0 +1,11 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\app",
+    "\\app\\middleware",
+    "\\app\\passport",
+    "\\routes"
+  ],
+  "SelectedNode": "\\routes\\user-router.js",
+  "PreviewInSolutionExplorer": false
+}
