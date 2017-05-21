@@ -4,7 +4,7 @@ const
     mongojs = require('mongojs'),
     config = require('../config/config'),
     db = mongojs(config.MONGODB, ['users']),
-    Auth = require('../app/helper/auth'),
+    auth = require('../app/helper/auth'),
     jwt = require('jsonwebtoken'),
     AuthMiddleware = require('../app/middleware/auth-middleware'),
     router = express.Router();
@@ -12,7 +12,7 @@ const
 const rp = passport.authenticate('jwt', { session: false });
 const rl = AuthMiddleware.requireLogin;
 
-router.get('/users', rp, rl, (req, res) => {
+router.get('/users', (req, res) => {
     db.users.find(function (err, data) {
         res.json({ data: data });
     })
@@ -25,8 +25,8 @@ router.get('/user/:userID', rp, rl, (req, res) => {
     });
 })
 
-router.post('/user', rp, rl, (req, res) => {
-    Auth.encrypt_password(req.body.password, (hash) => {
+router.post('/user', (req, res) => {
+    auth.encode_password(req.body.password, (hash) => {
         const body = req.body;
         body['password'] = hash;
         body['created_at'] = Date.now();
@@ -62,9 +62,9 @@ router.post('/user/auth', (req, res) => {
     }, (err, user) => {
         if (err) return console.log(err);
         if (!user) {
-            return res.json({ success: false, 'msg': 'Falha no login: Usuario não existe' });
+            return res.json({ success: false, 'msg': 'Falha no login: Usuario nï¿½o existe' });
         } else {
-            Auth.compare_password(req.body.password, user.password, (err, isMatch) => {
+            auth.compare_pass(req.body.password, user.password, (err, isMatch) => {
                 if (isMatch && !err) {
                     const token = jwt.sign(user, config.SECRET, { expiresIn: "24h" }); 
                     return res.json({ 'success': true, token: 'JWT ' + token });

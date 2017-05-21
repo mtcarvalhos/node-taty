@@ -8,6 +8,17 @@ const saltRounds = 10;
 let Auth = function () { }
 
 
+let encode_password = (password, cb) => {
+    bcrypt.genSalt(saltRounds, function (err, salt) {
+        if (err) return false;
+        bcrypt.hash(password, salt, null, function(err, hash) {
+            if (err) return false;
+            return cb(hash)
+        })
+
+    })
+}
+
 Auth.prototype.encrypt_password = function (password, cb) {
     bcrypt.genSalt(saltRounds, function (err, salt) {
         if (err) return false;
@@ -21,6 +32,14 @@ Auth.prototype.encrypt_password = function (password, cb) {
     return password;
 }
 
+let compare_pass = (password, password_db, cb) => {
+    bcrypt.compare(password, password_db, function (err, isMatch) {
+        if (err) return cb(err);
+        cb(null, isMatch)
+    });
+}
+
+
 Auth.prototype.compare_password = function (password, password_db, cb) {
     bcrypt.compare(password, password_db, function (err, isMatch) {
         if (err) return cb(err);
@@ -28,4 +47,11 @@ Auth.prototype.compare_password = function (password, password_db, cb) {
     });
 }
 
-module.exports = new Auth();
+
+module.exports = {
+    encode_password: encode_password,
+    compare_pass: compare_pass
+}
+/*module.exports.compare_pass = compare_pass;
+
+module.exports = new Auth();*/
